@@ -1,7 +1,9 @@
 import RegisterParams from "@/types/register.params";
 import { ENDPOINTS } from "./EndPoints";
 
-const BASE_URL: string = 'http://localhost:3001';
+//const BASE_URL: string = 'http://localhost:3001';
+
+const BASE_URL: string = 'https://be-week03-tienpham569us-projects.vercel.app';
 
 const getAuthToken = () => {
     const auth_token = localStorage.getItem('auth_token');
