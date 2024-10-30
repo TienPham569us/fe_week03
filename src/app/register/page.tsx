@@ -1,8 +1,8 @@
 'use client';
 import { ApiManager } from "@/api_manager/ApiManager";
-import Image from "next/image";
+import Loading from "@/components/loading";
 import Link from "next/link";
-import { FormEvent, useState, FocusEvent } from "react";
+import { FormEvent, useState, FocusEvent, useActionState, CSSProperties } from "react";
 import validator from "validator";
 
 export default function RegisterPage() {
@@ -12,7 +12,6 @@ export default function RegisterPage() {
   const [invalidEmail, setInvalidEmail] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-
   const validateEmail = (e: FocusEvent<HTMLInputElement>) => {
     const tempEmail = email;
     if (!tempEmail) {
@@ -27,8 +26,13 @@ export default function RegisterPage() {
       setInvalidEmail("");
     }
   }
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
+
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    //event.preventDefault();
     setMessage("");
     setError("");
     if (!email || !validator.isEmail(email)) {
@@ -40,6 +44,7 @@ export default function RegisterPage() {
       //console.log(response);
       console.log(data);
       console.log(response.status);
+      setLoading(false);
       if (400 <= response.status && response.status < 500) {
         if (data.message && Array.isArray(data.message)) {
 
@@ -67,8 +72,10 @@ export default function RegisterPage() {
     } catch (error) {
       console.error(error);
       setError("An error occurred. Please try again later.");
+      setLoading(false);
       return;
     }
+
     
   } 
 
@@ -82,7 +89,8 @@ export default function RegisterPage() {
           <h1 className="text-[#22d3ee]">Register Page</h1>
         </div>
         <form method="POST" //action={"/api/register"}
-          onSubmit={(e) => handleSubmit(e)}
+          
+          onSubmit={e => (onSubmit(e))}
           className="flex flex-col justify-center flex-wrap">
           <label className="label-style">Email</label>
           <input type="text" id="email" name="email" 
@@ -100,7 +108,7 @@ export default function RegisterPage() {
           }
 
           <label className="label-style">Username</label>
-          <input type="text" id="email" name="email" 
+          <input type="text" id="username" name="username" 
             className="input-style"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -115,22 +123,25 @@ export default function RegisterPage() {
             required/>
 
           <button className="button-style" 
-            type="submit" >
+            type="submit" 
+            disabled={loading}>
               Register
           </button>
+        
+          {loading && <div className="flex flex-row justify-center"><Loading/></div>}
           {
             (message && message.length!=0) 
-            ? (<text className="msg-success">
+            ? (<div className="msg-success">
               {message}
-            </text>)
+            </div>)
             : null
           }
 
           {
             (error && error.length!=0) 
-            ? (<text className="text-error font-bold">
+            ? (<div className="text-error font-bold">
               {error}
-            </text>)
+            </div>)
             : null
           }
         </form>
